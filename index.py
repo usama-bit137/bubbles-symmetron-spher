@@ -1,19 +1,20 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import simpson
-import seaborn as sns 
-from factory import *
+import seaborn as sns
+
+from factory import * 
 
 fig1, ax1 = plt.subplots(1)
+fig2, ax2 = plt.subplots(1)
 fig1.tight_layout()
+
 sns.set_theme(style = "white")
 
-def analytical_approx(t, t_s, r_s, w): 
+def analytical_approx(t, t_s, r_s, w):
     array = np.zeros(len(t))
-    
     m_0 = 1
-    phi_0 = Newton_Raphson(1, w, 0, 100)
-
+    phi_f = Newton_Raphson(1, w, 0, 100)
     ax1.axvline(1/m_0, 
                 label="$\lambda_0 = (\sqrt{2}\mu)^{-1}$", 
                 linestyle= "dotted", 
@@ -24,13 +25,15 @@ def analytical_approx(t, t_s, r_s, w):
                 linestyle= "dotted", 
                 color = "mediumvioletred")
     
+    prefactor = w*(0.5/r_s + (m_0)**(-2))+ phi_f
+
     for i in range(len(t)):
         if t[i] < t_s:
-            C = (phi_0/(t_s*np.sqrt(r_s)))*(1/np.cosh(np.sqrt(r_s)*t_s))
-            array[i] = C*(t_s/t[i])*np.sinh(np.sqrt(r_s)*t[i])
+            C = (1/(t_s*np.sqrt(r_s)))*prefactor*(1/np.cosh(np.sqrt(r_s)*t_s))
+            array[i] = C*(t_s/t[i])*np.sinh(np.sqrt(r_s)*t[i])-w/(2*r_s)
         else:
-            K = -phi_0*(1-(1/(t_s*np.sqrt(r_s))*np.tanh(np.sqrt(r_s)*t_s)))
-            array[i] = K*(t_s/t[i])*np.exp(-m_0*(t[i]-t_s)) + phi_0
+            K = -prefactor*(1-(1/(t_s*np.sqrt(r_s))*np.tanh(np.sqrt(r_s)*t_s)))
+            array[i] = K*(t_s/t[i])*np.exp(-m_0**(-1)*(t[i]-t_s)) + phi_f
 
     return array
 
@@ -78,6 +81,10 @@ for i in range(N):
                 linestyle="-.", 
                 color="r", 
                 label= "$\phi_f$")
+    
+    ax2.plot(x_cut, 0.5*v_cut**2)
+    ax2.set_xlabel("$\phi$")
+    ax2.set_ylabel("V($\phi$)")
 
 
 

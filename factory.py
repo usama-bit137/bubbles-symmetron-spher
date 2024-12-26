@@ -1,14 +1,11 @@
 import numpy as np 
 
 #Potential properties:
-def energy_density(x, v, t, w, r):
-    return (0.5*v**2 + potential_corr(x, w, r))
-
 def potential(x, w, r): 
-    return (1/4)*(x**2-(1-r))**2 + w*(x-1)
+    return (1/4)*(x**2-(1-r))**2 + 0.5*w*(x-1)
 
 def potential_derivative(x,w,r):
-    return x*(x**2-(1-r)) + w
+    return x*(x**2-(1-r)) + 0.5*w
 
 def potential_corr(x, E, r):
     x_plus = Newton_Raphson(1, E, r, 100)
@@ -17,13 +14,11 @@ def potential_corr(x, E, r):
 def potential_sec_der(x, w, r):
     return 3*x**2-(1-r) 
 
-
 #Root-finding:
 def Newton_Raphson(x, w, r, n):
     for i in range(n):
         x += -potential_derivative(x, w, r) / potential_sec_der(x, w, r)
     return x
-
 
 # ODE Solution:
 def ODE(x, v, t, w, r):
@@ -72,6 +67,8 @@ def IntBisec(a_u, a_o, E, r, N):
 
         Phi_mid = RK_22(amid, E, r)
 
+        
+        #testing the tolerance of the solution:
         if abs(Phi_u[0, -1] - Phi_mid[0, -1]) < 0.000001:
             a_u = np.float128(amid)
         else:
